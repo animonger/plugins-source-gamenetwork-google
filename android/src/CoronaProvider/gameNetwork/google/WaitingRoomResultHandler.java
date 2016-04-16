@@ -85,7 +85,15 @@ public class WaitingRoomResultHandler extends Listener implements CoronaActivity
 				ArrayList<String> participantIds = room.getParticipantIds();
 				for(int i = 0; i < participantIds.size(); i++) {
 					if(participantIds.get(i) != room.getParticipantId(finalGamesClient.getCurrentPlayerId())) {
+						// added participant id and participant alias to lua waiting room event callback
+						L.newTable(0, 2);
+							
 						L.pushString(participantIds.get(i));
+						L.setField(-2, RoomManager.PARTICIPANT_ID);
+
+						L.pushString(room.getParticipant(participantIds.get(i)).getDisplayName());
+						L.setField(-2, RoomManager.ALIAS);
+						
 						L.rawSet(-2, count);
 						count++;
 					}
