@@ -36,6 +36,8 @@ import com.google.android.gms.games.GamesClient;
 
 public class RoomManager implements RoomUpdateListener, RoomStatusUpdateListener {
 	public final static String ROOM_ID = "roomID";
+	public final static String PARTICIPANT_ID = "participantID";
+	public final static String ALIAS = "alias";
 
 	static int fRoomListener;
 	static HashMap<String, Room> fRooms;
@@ -208,7 +210,15 @@ public class RoomManager implements RoomUpdateListener, RoomStatusUpdateListener
 					while(iter.hasNext()) {
 						String participantId = iter.next();
 						if(room != null && participantId != room.getParticipantId(fGamesClient.getCurrentPlayerId())) {
+							// added participant id and participant alias to lua room event callback
+							L.newTable(0, 2);
+							
 							L.pushString(participantId);
+							L.setField(-2, PARTICIPANT_ID);
+
+							L.pushString(room.getParticipant(participantId).getDisplayName());
+							L.setField(-2, ALIAS);
+							
 							L.rawSet(-2, count);
 							count++;
 						}
