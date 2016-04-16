@@ -42,20 +42,21 @@ public class InvitationResultHandler extends Listener implements CoronaActivity.
 		activity.unregisterActivityResultHandler(this);
 		CoronaRuntimeTaskDispatcher dispatcher = activity.getRuntimeTaskDispatcher();
 
-		if (Activity.RESULT_OK == resultCode) { //return the room id that the user chose to join
-			Invitation inv = data.getExtras().getParcelable(GamesClient.EXTRA_INVITATION);
-			pushInvitationsToLua(inv.getInvitationId(), false, "selected");
+		if (Activity.RESULT_OK == resultCode) { // return the invitation that the user chose to accept
+			Invitation invitation = data.getExtras().getParcelable(GamesClient.EXTRA_INVITATION);
+			pushInvitationsToLua(invitation, false, "selected");
 		} else if(GamesActivityResultCodes.RESULT_RECONNECT_REQUIRED == resultCode) {
 			if (fGameHelper != null && fGameHelper.getGamesClient() != null) {
 				fGameHelper.signOut();
 			}
-			pushInvitationsToLua("", true, "logout");
+			pushInvitationsToLua(null, true, "logout");
 		} else {
-			pushInvitationsToLua("", true, "cancelled");
+			pushInvitationsToLua(null, true, "cancelled");
 		}
 	}
-
-	private void pushInvitationsToLua(final String invitationId, final boolean isError, final String phase) {
+	
+	// added inviter's alias and playerID to lua invitations callback event
+	private void pushInvitationsToLua(final Invitation invitation, final boolean isError, final String phase) {
 		CoronaRuntimeTask task = new CoronaRuntimeTask() {
 			@Override
 			public void executeUsing(CoronaRuntime runtime) {
@@ -68,8 +69,25 @@ public class InvitationResultHandler extends Listener implements CoronaActivity.
 				
 				L.newTable();
 
-				L.pushString(invitationId);
-				L.setField(-2, RoomManager.ROOM_ID);
+				if (invitation != null) {
+					L.pushString(invitation.getInvitationId());
+					L.setField(-2, RoomManager.ROOM_ID);
+				
+					L.pushString(invitation.getInviter().getDisplayName());
+					L.setField(-2, Listener.ALIAS);
+		
+					L.pushString(invitation.getInviter().getPlayer().getPlayerId());
+					L.setField(-2, Listener.PLAYER_ID);
+				} else {
+					L.pushString("");
+					L.setField(-2, RoomManager.ROOM_ID);
+				
+					L.pushString("");
+					L.setField(-2, Listener.ALIAS);
+		
+					L.pushString("");
+					L.setField(-2, Listener.PLAYER_ID);
+				}
 
 				L.pushString(phase);
 				L.setField(-2, "phase");
