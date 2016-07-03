@@ -34,6 +34,7 @@ import com.google.android.gms.games.multiplayer.realtime.RoomConfig;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.games.GamesActivityResultCodes;
+import com.google.android.gms.games.multiplayer.Invitation;
 
 public class LuaLoader implements JavaFunction {
 
@@ -678,8 +679,29 @@ public class LuaLoader implements JavaFunction {
 		} else if (requestedAction.equals("setRoomListener")) {
 			RoomManager.setRoomListener(listener);
 		} else if (requestedAction.equals("setInvitationReceivedListener")) {
+// 			Log.i("Corona", "[LuaLoader.java] setInvitationReceivedListener called >>>>>>>>>>>>>>>>>>>>>>");
 			if (isConnected()) {
 				helper.getGamesClient().registerInvitationListener(new InvitationReceivedListener(fDispatcher, listener));
+			}
+		} else if (requestedAction.equals("loadNotificationInvitation")) {
+// 			Log.i("Corona", "[LuaLoader.java] loadNotificationInvitation called *******************");
+			if (isConnected()) {
+				Invitation invitation = helper.hasInvitation();
+				
+				CoronaLua.newEvent(L, "notificationInvitation");
+				L.pushString("notificationInvitation");
+				L.setField(-2, Listener.TYPE);
+				
+				Listener.pushInvitationToLua(L, invitation);
+				L.setField(-2, Listener.DATA);
+				
+				try {
+					CoronaLua.dispatchEvent(L, listener, 0);
+					CoronaLua.deleteRef(L, listener);
+					helper.clearInvitation();
+				} catch(Exception ex) {
+					ex.printStackTrace();
+				}
 			}
 		} else if (requestedAction.equals("loadFriends")) {
 			(new LoadInvitablePlayersManager(fDispatcher, listener, helper.getGamesClient())).load();
