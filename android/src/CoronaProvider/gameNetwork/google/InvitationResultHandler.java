@@ -39,6 +39,7 @@ public class InvitationResultHandler extends Listener implements CoronaActivity.
 
 	@Override
 	public void onHandleActivityResult(CoronaActivity activity, int requestCode, int resultCode, android.content.Intent data) {
+// 		Log.i("Corona", "[InvitationResultHandler.java] onHandleActivityResult called!!!!!!!!!!!!!!!!!!!!!!!!!");
 		activity.unregisterActivityResultHandler(this);
 		CoronaRuntimeTaskDispatcher dispatcher = activity.getRuntimeTaskDispatcher();
 
@@ -65,10 +66,10 @@ public class InvitationResultHandler extends Listener implements CoronaActivity.
 				CoronaLua.newEvent(L, "invitations");
 
 				L.pushString("invitations");
-				L.setField(-2, "type");
+				L.setField(-2, Listener.TYPE);
 				
 				L.newTable();
-
+// 				Log.i("Corona", "[InvitationResultHandler.java] pushInvitationsToLua called!!!!!!!!!!!!!!!!!!!!!!!!!");
 				if (invitation != null) {
 					L.pushString(invitation.getInvitationId());
 					L.setField(-2, RoomManager.ROOM_ID);
@@ -95,7 +96,7 @@ public class InvitationResultHandler extends Listener implements CoronaActivity.
 				L.pushBoolean(isError);
 				L.setField(-2, "isError");
 
-				L.setField(-2, "data");
+				L.setField(-2, Listener.DATA);
 
 				try {
 					CoronaLua.dispatchEvent(L, fListener, 0);
