@@ -121,15 +121,28 @@ public abstract class Listener {
 
 	static protected void pushInvitationToLua(LuaState L, Invitation invitation) {
 		L.newTable(0, 3);
+		
+		if (invitation != null) {
+// 			Log.i("Corona", "[Listener.java] pushInvitationToLua invitation != null");
+			L.pushString(invitation.getInvitationId());
+			L.setField(-2, RoomManager.ROOM_ID);
 
-		L.pushString(invitation.getInvitationId());
-		L.setField(-2, RoomManager.ROOM_ID);
+			L.pushString(invitation.getInviter().getDisplayName());
+			L.setField(-2, ALIAS);
 
-		L.pushString(invitation.getInviter().getDisplayName());
-		L.setField(-2, ALIAS);
-
-		L.pushString(invitation.getInviter().getPlayer().getPlayerId());
-		L.setField(-2, PLAYER_ID);
+			L.pushString(invitation.getInviter().getPlayer().getPlayerId());
+			L.setField(-2, PLAYER_ID);
+		} else {
+// 			Log.i("Corona", "[Listener.java] pushInvitationToLua invitation == null");
+			L.pushString("");
+			L.setField(-2, RoomManager.ROOM_ID);
+				
+			L.pushString("");
+			L.setField(-2, ALIAS);
+		
+			L.pushString("");
+			L.setField(-2, PLAYER_ID);
+		}
 	}
 
 	static protected void pushPlayerToLua(LuaState L, Player player) {
