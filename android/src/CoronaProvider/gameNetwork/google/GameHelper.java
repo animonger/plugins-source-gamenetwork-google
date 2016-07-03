@@ -105,6 +105,10 @@ public class GameHelper implements GooglePlayServicesClient.ConnectionCallbacks,
     
     // Print debug logs?
     boolean mDebugLog = true;
+    
+    // store invitation from notification when on connected to the games client
+    Invitation mInvitation = null;
+    
     String mDebugTag = "BaseGameActivity";
 
     // Sign-in message
@@ -172,6 +176,14 @@ public class GameHelper implements GooglePlayServicesClient.ConnectionCallbacks,
     public GamesClient getGamesClient() {
         return mGamesClient;
     }
+    
+    public Invitation hasInvitation() {
+        return mInvitation;
+    }
+    
+    public void clearInvitation() {
+        mInvitation = null;
+    }
 
     void startConnections() {
         mConnectedClients = CLIENT_NONE;
@@ -231,6 +243,11 @@ public class GameHelper implements GooglePlayServicesClient.ConnectionCallbacks,
         
         // Mark the current client as connected
         mConnectedClients |= mClientCurrentlyConnecting;
+        
+        // if accepted notification invitation then store invitation to use after game finishes launch 
+        if (connectionHint != null) {
+        	mInvitation = connectionHint.getParcelable(GamesClient.EXTRA_INVITATION);
+        }
         
         // connect the next client in line, if any.
         connectNextClient();
