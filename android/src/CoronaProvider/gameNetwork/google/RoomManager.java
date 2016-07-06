@@ -36,7 +36,7 @@ import com.google.android.gms.games.GamesClient;
 
 public class RoomManager implements RoomUpdateListener, RoomStatusUpdateListener {
 	public final static String ROOM_ID = "roomID";
-	public final static String PARTICIPANT_ID = "participantID";
+	public final static String PARTICIPANT_ID = "participantId";
 	public final static String ALIAS = "alias";
 
 	static int fRoomListener;
@@ -115,6 +115,7 @@ public class RoomManager implements RoomUpdateListener, RoomStatusUpdateListener
 	//This is called when all the players are connected and the game can begin
 	@Override
 	public void onRoomConnected(int statusCode, Room room) {
+// 		Log.i("Corona", "[RoomManager.java] onRoomConnected called!!!!!!!!!!!!!!!!!!!!!!!!!");
 		ArrayList<String> participantIds = room.getParticipantIds();
 		pushToLua("connectedRoom", room, participantIds, false);
 	}
@@ -191,6 +192,7 @@ public class RoomManager implements RoomUpdateListener, RoomStatusUpdateListener
 	}
 
 	private void pushToLua(final String type, final Room room, final List<String> participantIds, final boolean isError) {
+// 		Log.i("Corona", "[RoomManager.java] pushToLua called!!!!!!!!!!!!!!!!!!!!!!!!!");
 		CoronaRuntimeTask task = new CoronaRuntimeTask() {
 			@Override
 			public void executeUsing(CoronaRuntime runtime) {
